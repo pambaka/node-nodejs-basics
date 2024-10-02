@@ -1,26 +1,23 @@
-import path from "path";
-import fs from "fs/promises";
-import getDirname from "./getDirname.js";
-import { errorMessage, folderName } from "./const.js";
+import fs from "node:fs/promises";
+import { errorMessage } from "./const.js";
+import getFilePath from "./getFilePath.js";
 
 const rename = async () => {
   const fileName = "wrongFilename.txt";
   const newFileName = "properFilename.md";
 
-  const __dirname = getDirname();
-
-  const filePath = path.join(__dirname, folderName, fileName);
-  fs.access(filePath).catch(() => {
+  const filePath = getFilePath(fileName);
+  await fs.access(filePath).catch(() => {
     throw new Error(errorMessage);
   });
 
-  const newFilePath = path.join(__dirname, folderName, newFileName);
-  fs.access(newFilePath).then(
+  const newFilePath = getFilePath(newFileName);
+  await fs.access(newFilePath).then(
     () => {
       throw new Error(errorMessage);
     },
-    () => {
-      fs.rename(filePath, newFilePath);
+    async () => {
+      await fs.rename(filePath, newFilePath);
     }
   );
 };
